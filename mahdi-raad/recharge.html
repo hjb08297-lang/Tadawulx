@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tadawulx تعبئة رصيد</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ستايل التصميم (لم يتغير ليبقى متناسق مع منصتك) */
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000000; color: #ffffff;
+            display: flex; justify-content: center; min-height: 100vh; user-select: none;
+        }
+        .app-container {
+            width: 100%; max-width: 400px; background-color: #000000;
+            position: relative; overflow-x: hidden; display: flex; flex-direction: column;
+        }
+        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; font-size: 16px; font-weight: bold; }
+        .top-header i { cursor: pointer; font-size: 18px; }
+
+        .networks-container { padding: 15px; display: block; }
+        .networks-box { background-color: #1e2329; border-radius: 15px; padding: 0 20px; direction: ltr; }
+        .network-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px dashed #333b45; cursor: pointer; transition: 0.2s; }
+        .network-item:last-child { border-bottom: none; }
+        .network-item:hover { opacity: 0.8; background-color: #2b3139; border-radius: 10px; padding-right: 10px; padding-left: 10px; }
+        .item-left { display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 600; letter-spacing: 0.5px; }
+        
+        .icon-group { position: relative; width: 32px; height: 32px; }
+        .main-icon { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        .main-icon img { width: 100%; height: 100%; object-fit: contain; }
+        .sub-icon { position: absolute; bottom: -3px; right: -3px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #1e2329; background-color: #ffffff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .sub-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .arrow-icon { color: #848e9c; font-size: 14px; }
+        
+        .payment-details-container { padding: 15px; display: none; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .payment-box { background-color: #1e2329; border-radius: 15px; padding: 20px; text-align: center; position: relative; }
+        .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .payment-logo { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: bold; }
+        .history-icon { color: #fcd535; font-size: 20px; cursor: pointer; }
+        .network-badge { display: flex; width: fit-content; margin: 0 auto 20px auto; align-items: center; gap: 10px; background-color: #2b3139; padding: 8px 20px; border-radius: 30px; font-weight: bold; font-size: 15px; direction: ltr; }        
+        .qr-box { background-color: #ffffff; padding: 10px; border-radius: 15px; display: inline-block; margin-bottom: 20px; }
+        .qr-box img { width: 180px; height: 180px; display: block; }
+        .address-title { font-size: 16px; margin-bottom: 15px; font-weight: bold; }
+        
+        .address-input-group { background-color: #fcd535; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; padding: 5px 5px 5px 15px; margin-bottom: 15px; }
+        .address-text { color: #000000; font-size: 13px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 70%; text-align: left; direction: ltr; }
+        .copy-btn { background-color: #4a4f55; color: #ffffff; border: none; border-radius: 20px; padding: 8px 18px; font-size: 12px; cursor: pointer; font-weight: bold; }
+
+        .input-field-group { margin-bottom: 15px; text-align: right; }
+        .input-field-group label { font-size: 13px; color: #848e9c; margin-bottom: 8px; display: block; font-weight: bold; }
+        .input-field-group input[type="number"], .input-field-group input[type="text"] { width: 100%; padding: 12px; border-radius: 10px; background-color: #2b3139; border: 1px solid #333b45; color: #fff; font-size: 14px; box-sizing: border-box; outline: none; }
+        .input-field-group input[type="number"]:focus, .input-field-group input[type="text"]:focus { border-color: #fcd535; }
+
+        .upload-box { border: 2px dashed #4a4f55; background-color: #2b3139; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 120px; position: relative; overflow: hidden; }
+        .upload-box:hover { border-color: #fcd535; background-color: #333b45; }
+        .upload-placeholder { display: flex; flex-direction: column; align-items: center; color: #848e9c; font-size: 13px; font-weight: 500; }
+        .upload-placeholder i { font-size: 28px; color: #fcd535; margin-bottom: 10px; }
+        .image-preview { width: 100%; max-height: 250px; object-fit: contain; border-radius: 8px; display: none; }
+
+        .complete-btn { background-color: #fcd535; color: #000000; width: 100%; padding: 15px; border: none; border-radius: 30px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 15px; margin-bottom: 20px; transition: 0.3s; }
+        .complete-btn:disabled { background-color: #555; cursor: not-allowed; color: #aaa; }
+        .instructions-box { background-color: transparent; padding: 15px; font-size: 12px; color: #848e9c; line-height: 1.8; text-align: right; }
+
+        #custom-toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 10px; padding: 15px 20px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        #custom-toast.show { visibility: visible; animation: fadein 0.4s, fadeout 0.4s 2.6s; }
+        #custom-toast.error { background-color: #e74c3c; color: white; border: 1px solid #c0392b; }
+        #custom-toast.success { background-color: #2ecc71; color: white; border: 1px solid #27ae60; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div id="custom-toast"></div>
+
+    <div class="app-container">
+        <div class="top-header">
+            <i class="fa-solid fa-chevron-left" onclick="goBack()"></i>
+            <span>تعبئة رصيد</span>
+            <div style="width: 20px;"></div> 
+        </div>
+
+        <div class="networks-container" id="view-networks">
+            <div class="networks-box">
+                <div class="network-item" onclick="openPayment(this, 'BNB Smart Chain (BEP20)', 'b12.jpg', '0x4f75ae2f403a51898ade79ccac92d233a3ba8040')">
+                    <div class="item-left">
+                        <div class="icon-group">
+                            <div class="main-icon"><img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT"></div>
+                            <div class="sub-icon"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB"></div>
+                        </div>
+                        <span>BEP20-USDT</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                </div>
+
+                <div class="network-item" onclick="openPayment(this, 'Tron (TRC20)', 'b13.jpg', 'TDBBJwDV5ggo92tEiiDdDN34Wb9ocqgXsx')">
+                    <div class="item-left">
+                       <div class="icon-group">
+                            <div class="main-icon"><img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT"></div>
+                            <div class="sub-icon"><img src="https://cryptologos.cc/logos/tron-trx-logo.png" alt="TRON"></div>
+                        </div>
+                        <span>TRC20-USDT</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                </div>
+
+                <div class="network-item" onclick="openPayment(this, 'TRX', 'b14.jpg', 'TDBBJwDV5ggo92tEiiDdDN34Wb9ocqgXsx')">
+                    <div class="item-left">
+                        <div class="icon-group">
+                            <div class="main-icon"><img src="https://cryptologos.cc/logos/tron-trx-logo.png" alt="TRX"></div>
+                        </div>
+                        <span>TRX</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                </div>
+
+                <div class="network-item" onclick="openPayment(this, 'BNB Smart Chain (BEP20)', 'b12.jpg', '0x4f75ae2f403a51898ade79ccac92d233a3ba8040')">
+                    <div class="item-left">
+                        <div class="icon-group">
+                            <div class="main-icon"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB"></div>
+                        </div>
+                        <span>BNB</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="payment-details-container" id="view-payment">
+            <div class="payment-header">
+                <div class="payment-logo">
+                    <i class="fa-solid fa-globe" style="color: #4facfe; font-size: 20px;"></i>
+                    <span>Tadawulx</span>
+                </div>
+                <i class="fa-solid fa-book-bookmark history-icon" onclick="window.location.href='notifications.html'"></i>
+            </div>
+
+            <div class="payment-box">
+                <div class="network-badge">
+                    <div id="display-icon-container"></div>
+                    <span id="display-network-name">BNB Smart Chain (BEB20)</span>
+                </div>
+
+                <div class="qr-box">
+                    <img src="" alt="QR Code" id="display-qr">
+                </div>
+
+                <div class="address-title">عنوان إعادة الشحن</div>
+
+                <div class="address-input-group">
+                    <div class="address-text" id="display-address">0x4f75ae2f403a51898ade79ccac92d233a3ba8040</div>
+                    <button class="copy-btn" onclick="copyAddress()">ينسخ</button>
+                </div>
+
+                <div class="input-field-group">
+                    <label>المبلغ المشحون (الكمية):</label>
+                    <input type="number" id="tx-amount" placeholder="أدخل المبلغ الذي قمت بتحويله" required>
+                </div>
+
+                <div class="input-field-group">
+                    <label>رقم المعاملة (TxID / Hash):</label>
+                    <input type="text" id="tx-hash" placeholder="الصق رقم المعاملة للتحقق من الإيداع" required style="direction: ltr;">
+                </div>
+
+                <div class="input-field-group">
+                    <label>إرفاق إيصال التحويل:</label>
+                    <input type="file" id="tx-screenshot" accept="image/*" style="display: none;" required>
+                   <div class="upload-box" onclick="document.getElementById('tx-screenshot').click()">
+                        <div class="upload-placeholder" id="upload-text-container">
+                            <i class="fa-solid fa-camera"></i>
+                            <span>انقر هنا لإضافة صورة الإيصال</span>
+                        </div>
+                        <img src="" alt="معاينة السكرين شوت" class="image-preview" id="image-preview-el">
+                    </div>
+                </div>
+
+                <button class="complete-btn" id="submit-btn" onclick="completeRecharge()">اكتملت عملية إعادة الشحن</button>
+            </div>
+
+           <div class="instructions-box" style="background-color: #1e2329; border-radius: 15px; padding: 20px; font-size: 13px; color: #848e9c; line-height: 1.8; text-align: right; margin-top: 15px; border: 1px solid #333b45;">
+                <h4 style="color: #fcd535; margin-top: 0; margin-bottom: 15px; font-size: 14px;"><i class="fa-solid fa-circle-exclamation"></i> ملاحظات هامة لإتمام الشحن:</h4>
+                <ul style="padding-right: 20px; margin: 0;">
+                    <li style="margin-bottom: 10px;"><strong>رقم المعاملة (TxID):</strong> إدخال رقم المعاملة بشكل صحيح إلزامي. بدونه سيتم رفض الطلب.</li>
+                    <li style="margin-bottom: 10px;"><strong>تأكد من مطابقة الشبكة:</strong> يرجى التأكد من اختيار الشبكة الصحيحة لتتطابق مع العنوان أعلاه.</li>
+                    <li style="margin-bottom: 10px;"><strong>المبلغ الدقيق:</strong> تأكد من إرسال نفس المبلغ المكتوب في الطلب.</li>
+                    <li style="margin-bottom: 15px;"><strong>إرفاق الإيصال:</strong> ارفع "سكرين شوت" واضح لنجاح العملية يظهر فيه رقم العملية.</li>
+                </ul>
+
+                <div style="background-color: rgba(231, 76, 60, 0.1); border-right: 3px solid #e74c3c; padding: 12px; border-radius: 8px; margin-top: 10px;">
+                    <strong style="color: #e74c3c; display: block; margin-bottom: 5px;"><i class="fa-solid fa-triangle-exclamation"></i> إخلاء مسؤولية تام:</strong>
+                    <span style="color: #d1d5db; font-size: 12px;">أي محاولة تلاعب بالصور أو إدخال أرقام معاملات وهمية سيؤدي إلى حظر الحساب فوراً.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCa3nVSth5Jhhuhvblw23w0uxzR1VJHLOo",
+            authDomain: "yaqoout-b4c83.firebaseapp.com",
+            projectId: "yaqoout-b4c83",
+            storageBucket: "yaqoout-b4c83.firebasestorage.app",
+            messagingSenderId: "21558070357",
+            appId: "1:21558070357:web:6237dcf59b162b5dae18dc"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let userDataFull = {};
+
+        const tgToken = "8970185207:AAEI9QHtuUVWmPulbJ-Pe8e0_viXYOPavRY";
+        const tgChatId = "1459094404";
+        const imgbbApiKey = "6f7fb0f343b0bee90b0976864a54bd9a";
+
+        window.showToast = function(message, type = "error") {
+            const toast = document.getElementById("custom-toast") || document.getElementById("system-toast");
+            if (toast) {
+                toast.innerText = message;
+                toast.className = "show " + type; 
+                setTimeout(() => { toast.className = ""; }, 4000);
+            } else {
+                alert(message); 
+            }
+        };
+
+        window.goBack = function() {
+            const paymentView = document.getElementById('view-payment');
+            if (paymentView.style.display === 'block') {
+                paymentView.style.display = 'none';
+                document.getElementById('view-networks').style.display = 'block';
+            } else {
+                window.location.href = 'home.html';
+            }
+        };
+
+        window.openPayment = function(element, networkName, qrImage, walletAddress) {
+            document.getElementById('view-networks').style.display = 'none';
+            document.getElementById('view-payment').style.display = 'block';
+            
+            document.getElementById('display-network-name').innerText = networkName;
+            document.getElementById('display-address').innerText = walletAddress;
+            document.getElementById('display-qr').src = qrImage;
+        };
+
+        window.copyAddress = function() {
+            const address = document.getElementById('display-address').innerText;
+            navigator.clipboard.writeText(address).then(() => {
+                window.showToast("تم نسخ العنوان بنجاح!", "success");
+            }).catch(err => {
+                window.showToast("فشل النسخ، يرجى المحاولة يدوياً.", "error");
+            });
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    const userSnap = await getDoc(doc(db, "users", user.uid));
+                    if (userSnap.exists()) {
+                        userDataFull = userSnap.data();
+                    }
+                } catch (e) { console.log("Error loading user data", e); }
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        const fileInput = document.getElementById('tx-screenshot');
+        const previewImage = document.getElementById('image-preview-el');
+        const uploadTextContainer = document.getElementById('upload-text-container');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        previewImage.src = event.target.result;
+                        previewImage.style.display = 'block'; 
+                        uploadTextContainer.style.display = 'none'; 
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        window.completeRecharge = async function() {
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const txHash = document.getElementById('tx-hash').value.trim(); 
+            const network = document.getElementById('display-network-name').innerText;
+            const depositAddress = document.getElementById('display-address').innerText;
+            const btn = document.getElementById('submit-btn');
+
+            if (isNaN(amount) || amount < 10) {
+                return window.showToast("الحد الأدنى للشحن هو 10 USDT!", "error");
+            }
+            if (!txHash || txHash.length < 10) {
+                return window.showToast("يرجى إدخال رقم معاملة (TxID) صحيح!", "error");
+            }
+            if (fileInput.files.length === 0) {
+                return window.showToast("يرجى إرفاق سكرين شوت الإيصال!", "error");
+            }
+
+            btn.disabled = true;
+            btn.innerText = "جاري التحقق من الطلب...";
+
+            try {
+                const pendingQuery = query(collection(db, "deposits"), where("userId", "==", currentUser.uid), where("status", "==", "pending"));
+                const pendingSnap = await getDocs(pendingQuery);
+                if (!pendingSnap.empty) {
+                    btn.disabled = false;
+                    btn.innerText = "اكتملت عملية إعادة الشحن";
+                    return window.showToast("لديك طلب شحن قيد المعالجة بالفعل، الرجاء الانتظار!", "error");
+                }
+
+                const hashQuery = query(collection(db, "deposits"), where("txHash", "==", txHash));
+                const hashSnap = await getDocs(hashQuery);
+                if (!hashSnap.empty) {
+                    btn.disabled = false;
+                    btn.innerText = "اكتملت عملية إعادة الشحن";
+                    return window.showToast("رقم المعاملة (TxID) مستخدم سابقاً! لا يمكن تكرار الطلب.", "error");
+                }
+
+                btn.innerText = "جاري رفع الإيصال والمصادقة...";
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append("image", file);
+
+                const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+                    method: "POST", body: formData
+                });
+                const imgbbData = await imgbbResponse.json();
+                
+                if (!imgbbData.success) throw new Error("فشل رفع الصورة.");
+
+                const imageUrl = imgbbData.data.url;
+                btn.innerText = "جاري تسجيل طلبك يرجى الانتظار...";
+
+                // 🛡️ التعديل الجديد: سحب الباقة والأرباح
+                const uPhone = userDataFull.phone || "غير متوفر";
+                const uName = userDataFull.name || "غير متوفر"; 
+                const uOldBalance = parseFloat(userDataFull.balance || 0);
+                const uProfits = parseFloat(userDataFull.totalRevenue || userDataFull.profit || 0); // جلب الأرباح
+                const uVip = userDataFull.activeVipId || userDataFull.vipLevel || "غير متوفر (مجاني)"; // جلب اسم الباقة
+
+                // حفظ الطلب في قاعدة بيانات الفايرستور بكل تفاصيله الجديدة
+                await addDoc(collection(db, "deposits"), {
+                    userId: currentUser.uid,
+                    userName: uName,
+                    userEmail: currentUser.email || "بدون إيميل",
+                    phone: uPhone,
+                    oldBalance: uOldBalance,
+                    totalProfits: uProfits, // تمت الإضافة هنا للوحة الأدمن
+                    vipLevel: uVip,         // تمت الإضافة هنا للوحة الأدمن
+                    amount: amount,
+                    txHash: txHash,
+                    screenshotUrl: imageUrl,
+                    network: network,
+                    walletAddress: depositAddress,
+                    status: "pending", 
+                    timestamp: serverTimestamp()
+                });
+
+                // 🛡️ رسالة التليجرام مع التعديلات الجديدة (الأرباح والباقة)
+                const message = `🚨 طلب إيداع محمي وجديد 🚨\n\n` +
+                                `👤 الاسم: ${uName}\n` +
+                                `🆔 آيدي العميل: ${currentUser.uid}\n` +
+                                `📧 الإيميل: ${currentUser.email || "بدون إيميل"}\n` +
+                                `📱 رقم الهاتف: ${uPhone}\n` +
+                                `💰 الرصيد السابق: ${uOldBalance} USDT\n` +
+                                `📈 الأرباح الحالية: ${uProfits} USDT\n` +
+                                `💎 الباقة المشترك بها: ${uVip}\n\n` +
+                                `📥 المبلغ المطلوب شحنه: ${amount} USDT\n` +
+                                `🌐 الشبكة المستخدمة: ${network}\n` +
+                                `🔗 رقم المعاملة (TxID):\n${txHash}\n\n` +
+                                `🖼 رابط الإيصال المرفوع:\n${imageUrl}`;
+
+                const url = `https://api.telegram.org/bot${tgToken}/sendMessage?chat_id=${tgChatId}&text=${encodeURIComponent(message)}`;
+                fetch(url).catch(e => console.log("Telegram Error"));
+
+                window.showToast("تم تقديم طلب الشحن بنجاح وهو قيد المعالجة الآن!", "success");
+                setTimeout(() => { window.location.href = "home.html"; }, 2000);
+
+            } catch (error) {
+                console.error(error);
+                window.showToast("حدث خطأ أثناء المعالجة، تأكد من الإنترنت وحاول مجدداً.", "error");
+                btn.disabled = false;
+                btn.innerText = "اكتملت عملية إعادة الشحن";
+            }
+        };
+    </script>
+</body>
+</html>
+

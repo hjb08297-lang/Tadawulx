@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tadawulx - أنا</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { background-color: #0b0e11; color: #ffffff; user-select: none; padding-bottom: 80px; overflow-x: hidden; }
+
+        /* الهيدر */
+        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; font-size: 16px; font-weight: bold; background-color: #181a20; border-bottom: 1px solid #2b3139; position: sticky; top: 0; z-index: 100; }
+        .top-header i { cursor: pointer; font-size: 20px; color: #fcd535; }
+
+        /* معلومات البروفايل */
+        .profile-section { display: flex; align-items: center; padding: 20px; gap: 15px; }
+        .avatar-container { position: relative; }
+        .avatar-container img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #fcd535; object-fit: cover; }
+        .vip-badge { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, #fcd535, #eec100); color: #000; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+        
+        .user-info { flex: 1; }
+        .user-phone { font-size: 18px; font-weight: bold; margin-bottom: 5px; color: #fff; }
+        .user-id-box { display: inline-flex; align-items: center; gap: 8px; background-color: #1e2329; padding: 5px 12px; border-radius: 20px; font-size: 12px; color: #848e9c; cursor: pointer; transition: 0.2s; }
+        .user-id-box:active { transform: scale(0.95); background-color: #2b3139; color: #fcd535; }
+        .user-id-box i { color: #fcd535; }
+
+        /* كارت الرصيد والأزرار */
+        .balance-card { background-color: #181a20; margin: 0 15px 15px; padding: 20px; border-radius: 16px; border: 1px solid #2b3139; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .balance-title { font-size: 13px; color: #848e9c; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .balance-amount { font-size: 32px; font-weight: bold; color: #ffffff; margin-bottom: 20px; font-family: monospace; }
+        
+        .action-buttons { display: flex; justify-content: space-between; gap: 10px; }
+        .action-btn { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 14px; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; text-align: center; }
+        .action-btn:active { transform: scale(0.95); }
+        .btn-deposit { background-color: #fcd535; color: #000; }
+        .btn-withdraw { background-color: #2b3139; color: #fff; }
+        .btn-details { background-color: #2b3139; color: #fff; }
+
+        /* إحصائيات الأرباح الدقيقة */
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 0 15px 20px; }
+        .stat-box { background-color: #181a20; border: 1px solid #2b3139; border-radius: 12px; padding: 15px; text-align: center; }
+        .stat-box .lbl { font-size: 11px; color: #848e9c; display: block; margin-bottom: 5px; }
+        .stat-box .val { font-size: 15px; font-weight: bold; color: #00ffcc; }
+        .stat-box:first-child .val { color: #fcd535; }
+
+        /* القائمة (المنيو) */
+        .menu-list { margin: 0 15px; background-color: #181a20; border-radius: 16px; border: 1px solid #2b3139; overflow: hidden; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid #2b3139; cursor: pointer; transition: 0.2s; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:active { background-color: #1e2329; }
+        .menu-right { display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: bold; color: #eaeaec; }
+        .menu-icon { width: 24px; text-align: center; font-size: 18px; color: #848e9c; }
+        .menu-arrow { color: #848e9c; font-size: 14px; }
+        
+        /* زر تسجيل الخروج */
+        .logout-item { margin-top: 15px; background-color: #181a20; margin: 15px; border-radius: 16px; border: 1px solid #2b3139; }
+        .logout-text { color: #f6465d !important; }
+        .logout-icon { color: #f6465d !important; }
+
+        /* =========================================
+           نظام النوافذ المنبثقة (Modals)
+           ========================================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
+        .modal-overlay.active { display: block; opacity: 1; }
+        
+        .modal-content { position: fixed; bottom: -100%; left: 0; width: 100%; background: #181a20; border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px 20px; z-index: 2001; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-content.active { bottom: 0; }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 16px; font-weight: bold; border-bottom: 1px solid #2b3139; padding-bottom: 15px; }
+        .modal-header i { font-size: 22px; color: #848e9c; cursor: pointer; }
+        
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; color: #848e9c; margin-bottom: 8px; }
+        .input-group input { width: 100%; background: #0b0e11; border: 1px solid #2b3139; color: #fff; padding: 12px 15px; border-radius: 10px; font-size: 14px; outline: none; }
+        .input-group input:focus { border-color: #fcd535; }
+        
+        .submit-btn { width: 100%; background: #fcd535; color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .submit-btn:active { transform: scale(0.98); }
+
+        /* التنبيهات */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #02c076; color: #fff; padding: 12px 25px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 3000; transition: transform 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .toast.error { background: #f6465d; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        /* ---------------- القائمة السفلية ---------------- */
+.bottom-nav { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    background-color: #000000; 
+    display: flex; 
+    justify-content: space-around; 
+    padding: 10px 0 15px; 
+    border-top: 1px solid #2b3139; 
+    z-index: 100; 
+    direction: ltr; /* هذا السطر هو الذي يعكس الترتيب من اليسار لليمين */
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; color: #848e9c; font-size: 11px; gap: 6px; font-weight: bold; text-decoration: none; }
+.nav-item.active { color: #fcd535; }
+.nav-item i { font-size: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="top-header">
+        <i class="fa-solid fa-chevron-right" onclick="history.back()"></i>
+        <span>أنا</span>
+        <div style="width: 20px;"></div>
+    </div>
+
+    <div class="profile-section">
+        <div class="avatar-container">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Avatar">
+            <div class="vip-badge" id="vip-level">VIP 1</div>
+        </div>
+        <div class="user-info">
+            <div class="user-phone" id="user-phone-display">جاري التحميل...</div>
+            <div class="user-id-box" onclick="copyUID()">
+                <span>UID:</span>
+                <span id="uid-text">------</span>
+                <i class="fa-regular fa-copy"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="balance-card">
+        <div class="balance-title">
+            <span>إجمالي الأصول (USDT)</span>
+            <i class="fa-solid fa-eye-slash" style="cursor: pointer;" onclick="toggleBalance()"></i>
+        </div>
+        <div class="balance-amount" id="total-balance">0.00</div>
+        
+        <div class="action-buttons">
+            <button class="action-btn btn-deposit" onclick="window.location.href='deposit.html'">إيداع</button>
+            <button class="action-btn btn-withdraw" onclick="window.location.href='withdraw.html'">سحب</button>
+            <button class="action-btn btn-details" onclick="window.location.href='activity.html'">سجل النشاط</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <span class="lbl">إجمالي الإيرادات</span>
+            <span class="val" id="stat-total-rev">0.00</span>
+        </div>
+        <div class="stat-box">
+            <span class="lbl">عمولات الفريق</span>
+            <span class="val" id="stat-team-rev">0.00</span>
+        </div>
+        <div class="stat-box">
+            <span class="lbl">أرباح أمس</span>
+            <span class="val" id="stat-yesterday-rev">0.00</span>
+        </div>
+        <div class="stat-box">
+            <span class="lbl">أرباح اليوم</span>
+            <span class="val" id="stat-today-rev">0.00</span>
+        </div>
+    </div>
+
+    <div class="menu-list">
+        
+        <div class="menu-item" onclick="openModal('changeLoginPwdModal')">
+            <div class="menu-right">
+                <i class="fa-solid fa-lock menu-icon"></i>
+                <span>تغيير كلمة المرور</span>
+            </div>
+            <i class="fa-solid fa-chevron-left menu-arrow"></i>
+        </div>
+
+        <div class="menu-item" onclick="openModal('createSecPwdModal')">
+            <div class="menu-right">
+                <i class="fa-solid fa-key menu-icon" style="color: #fcd535;"></i>
+                <span>إنشاء كلمة مرور الأمان</span>
+            </div>
+            <i class="fa-solid fa-chevron-left menu-arrow"></i>
+        </div>
+
+        <div class="menu-item" onclick="openModal('changeSecPwdModal')">
+            <div class="menu-right">
+                <i class="fa-solid fa-shield-halved menu-icon"></i>
+                <span>تغيير كلمة مرور الأمان</span>
+            </div>
+            <i class="fa-solid fa-chevron-left menu-arrow"></i>
+        </div>
+
+        <div class="menu-item" onclick="window.location.href='help.html'">
+            <div class="menu-right">
+                <i class="fa-regular fa-newspaper menu-icon"></i>
+                <span>الأخبار والمساعدة</span>
+            </div>
+            <i class="fa-solid fa-chevron-left menu-arrow"></i>
+        </div>
+
+        <div class="menu-item" onclick="window.location.href='https://t.me/Tadawulx99'">
+            <div class="menu-right">
+                <i class="fa-brands fa-telegram menu-icon" style="color: #0088cc;"></i>
+                <span>خدمة الزبائن</span>
+            </div>
+            <i class="fa-solid fa-chevron-left menu-arrow"></i>
+        </div>
+    </div>
+
+    <div class="menu-list logout-item">
+        <div class="menu-item" onclick="performLogout()">
+            <div class="menu-right">
+                <i class="fa-solid fa-right-from-bracket menu-icon logout-icon"></i>
+                <span class="logout-text">تسجيل الخروج</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+    <div class="modal-content" id="changeLoginPwdModal">
+        <div class="modal-header">
+            <span>تغيير كلمة المرور</span>
+            <i class="fa-solid fa-xmark" onclick="closeAllModals()"></i>
+        </div>
+        <div class="input-group">
+            <label>كلمة المرور القديمة</label>
+            <input type="password" id="login-old-pwd" placeholder="أدخل كلمة المرور الحالية">
+        </div>
+        <div class="input-group">
+            <label>كلمة المرور الجديدة</label>
+            <input type="password" id="login-new-pwd" placeholder="أدخل كلمة المرور الجديدة">
+        </div>
+        <div class="input-group">
+            <label>تأكيد كلمة المرور</label>
+            <input type="password" id="login-confirm-pwd" placeholder="أعد إدخال كلمة المرور الجديدة">
+        </div>
+        <button class="submit-btn" onclick="submitChangeLoginPwd()">حفظ التغييرات</button>
+    </div>
+
+    <div class="modal-content" id="createSecPwdModal">
+        <div class="modal-header">
+            <span>إنشاء كلمة مرور الأمان</span>
+            <i class="fa-solid fa-xmark" onclick="closeAllModals()"></i>
+        </div>
+        <div style="font-size: 11px; color: #848e9c; margin-bottom: 15px; text-align: center;">يتم استخدام هذه الكلمة لحماية أموالك عند السحب فقط.</div>
+        <div class="input-group">
+            <label>كلمة مرور الأمان الجديدة</label>
+            <input type="password" id="create-sec-pwd" placeholder="أدخل كلمة مرور الأمان">
+        </div>
+        <div class="input-group">
+            <label>تأكيد كلمة المرور</label>
+            <input type="password" id="create-sec-confirm" placeholder="أعد إدخال كلمة المرور">
+        </div>
+        <button class="submit-btn" onclick="submitCreateSecPwd()">إنشاء الكلمة</button>
+    </div>
+
+    <div class="modal-content" id="changeSecPwdModal">
+        <div class="modal-header">
+            <span>تغيير كلمة مرور الأمان</span>
+            <i class="fa-solid fa-xmark" onclick="closeAllModals()"></i>
+        </div>
+        <div class="input-group">
+            <label>كلمة مرور الأمان القديمة</label>
+            <input type="password" id="change-sec-old" placeholder="أدخل الكلمة الحالية">
+        </div>
+        <div class="input-group">
+            <label>كلمة مرور الأمان الجديدة</label>
+            <input type="password" id="change-sec-new" placeholder="أدخل الكلمة الجديدة">
+        </div>
+        <div class="input-group">
+            <label>تأكيد كلمة المرور</label>
+            <input type="password" id="change-sec-confirm" placeholder="أعد إدخال الكلمة الجديدة">
+        </div>
+        <button class="submit-btn" onclick="submitChangeSecPwd()">تغيير الكلمة</button>
+    </div>
+
+    <div class="toast" id="system-toast">تم بنجاح!</div>
+    <div class="bottom-nav">
+    <a href="home.html" class="nav-item">
+        <i class="fa-solid fa-house"></i>
+        <span data-ar="بيت" data-en="Home">بيت</span>
+    </a>
+    <a href="quantify.html" class="nav-item ">
+        <i class="fa-solid fa-bolt"></i>
+        <span data-ar="تحديد الكمية" data-en="Quantify">تحديد الكمية</span>
+    </a>
+    <a href="invite.html" class="nav-item">
+        <i class="fa-solid fa-share-from-square"></i>
+        <span data-ar="ادعو أصدقاء" data-en="Invite">ادعو أصدقاء</span>
+    </a>
+    <a href="ana.html" class="nav-item active">
+        <i class="fa-regular fa-user"></i>
+        <span data-ar="أنا" data-en="Me">أنا</span>
+    </a>
+</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, updatePassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // إعدادات الفايربيز المحدثة والموحدة (V10)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCa3nVSth5Jhhuhvblw23w0uxzR1VJHLOo",
+            authDomain: "yaqoout-b4c83.firebaseapp.com",
+            projectId: "yaqoout-b4c83",
+            storageBucket: "yaqoout-b4c83.firebasestorage.app",
+            messagingSenderId: "21558070357",
+            appId: "1:21558070357:web:6237dcf59b162b5dae18dc"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUID = "------";
+        let actualBalance = "0.00";
+        let isBalanceHidden = false;
+        let userDbSecPwd = null; // سيحفظ كلمة مرور الأمان من الفايربيس للتحقق منها
+
+        // جلب البيانات الحقيقية والآمنة من الفايربيس بشكل لحظي
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUID = user.uid.substring(0, 8).toUpperCase();
+                document.getElementById('uid-text').innerText = currentUID;
+                document.getElementById('user-phone-display').innerText = user.phoneNumber || user.email || "مستخدم Tadawulx";
+
+                // استماع حقيقي ومباشر يمنع أي تلاعب بالبيانات أو الأرباح
+                onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                    if(docSnap.exists()) {
+                        let data = docSnap.data();
+                        
+                        // استخدام الحقل الموحد balance المرتبط بالإيداع والسحب والضغطة
+                        actualBalance = (parseFloat(data.balance) || 0).toFixed(2);
+                        if(!isBalanceHidden) document.getElementById('total-balance').innerText = actualBalance;
+                        
+                        // عرض الإيرادات والأرباح الحقيقية بالكامل
+                        document.getElementById('stat-total-rev').innerText = "$" + (parseFloat(data.totalRevenue) || 0).toFixed(2);
+                        document.getElementById('stat-team-rev').innerText = "$" + (parseFloat(data.teamRevenue) || 0).toFixed(2);
+                        document.getElementById('stat-today-rev').innerText = "$" + (parseFloat(data.todayRevenue) || 0).toFixed(2);
+                        document.getElementById('stat-yesterday-rev').innerText = "$" + (parseFloat(data.yesterdayRevenue) || 0).toFixed(2);
+                        document.getElementById('vip-level').innerText = `VIP ${data.activeVipId || 0}`;
+
+                        // جلب كلمة مرور الأمان ومزامنتها لكي يتعرف عليها كود السحب (withdraw.html)
+                        userDbSecPwd = data.withdrawPassword || null;
+                    }
+                });
+            } else {
+                window.location.href = 'index.html'; 
+            }
+        });
+
+        // جعل الدوال متاحة للـ HTML (onclick) في النظام الموديولر
+        window.openModal = function(modalId) {
+            // تنظيف الحقول عند فتح النافذة
+            document.querySelectorAll('input[type="password"]').forEach(input => input.value = '');
+            
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById(modalId).classList.add('active');
+        };
+
+        window.closeAllModals = function() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.querySelectorAll('.modal-content').forEach(el => el.classList.remove('active'));
+        };
+
+        // 1. تغيير كلمة مرور الدخول (محمية ومباشرة بالسيرفر)
+        window.submitChangeLoginPwd = function() {
+            let oldPwd = document.getElementById('login-old-pwd').value;
+            let newPwd = document.getElementById('login-new-pwd').value;
+            let confirmPwd = document.getElementById('login-confirm-pwd').value;
+
+            if(!oldPwd || !newPwd || !confirmPwd) return showToast("يرجى ملء جميع الحقول!", true);
+            if(newPwd !== confirmPwd) return showToast("كلمة المرور الجديدة غير متطابقة!", true);
+            if(newPwd.length < 6) return showToast("يجب أن تتكون من 6 أحرف أو أرقام على الأقل", true);
+
+            updatePassword(auth.currentUser, newPwd).then(() => {
+                closeAllModals();
+                showToast("تم تغيير كلمة مرور الدخول بنجاح!");
+            }).catch((error) => {
+                if(error.code === 'auth/requires-recent-login') {
+                    showToast("يرجى تسجيل الخروج والدخول مجدداً لأسباب أمنية", true);
+                } else {
+                    showToast("حدث خطأ أثناء تغيير كلمة المرور، يرجى إعادة المحاولة", true);
+                }
+            });
+        };
+
+        // 2. إنشاء كلمة مرور الأمان لأول مرة (تُحفظ في السيرفر ليقرأها كود السحب)
+        window.submitCreateSecPwd = function() {
+            let newPwd = document.getElementById('create-sec-pwd').value;
+            let confirmPwd = document.getElementById('create-sec-confirm').value;
+
+            if(userDbSecPwd) return showToast("لديك كلمة مرور أمان مسبقاً، يرجى اختيار التغيير.", true);
+            if(!newPwd || !confirmPwd) return showToast("يرجى ملء جميع الحقول!", true);
+            if(newPwd !== confirmPwd) return showToast("كلمتا المرور غير متطابقتين!", true);
+            if(newPwd.length < 6) return showToast("يجب أن تتكون من 6 أرقام/أحرف على الأقل", true);
+
+            updateDoc(doc(db, "users", auth.currentUser.uid), {
+                withdrawPassword: newPwd
+            }).then(() => {
+                closeAllModals();
+                showToast("تم إنشاء كلمة مرور الأمان بنجاح!");
+            }).catch(err => showToast("حدث خطأ في الاتصال بقاعدة البيانات", true));
+        };
+
+        // 3. تغيير كلمة مرور الأمان القديمة
+        window.submitChangeSecPwd = function() {
+            let oldPwd = document.getElementById('change-sec-old').value;
+            let newPwd = document.getElementById('change-sec-new').value;
+            let confirmPwd = document.getElementById('change-sec-confirm').value;
+
+            if(!userDbSecPwd) return showToast("لم تقم بإنشاء كلمة مرور أمان بعد!", true);
+            if(!oldPwd || !newPwd || !confirmPwd) return showToast("يرجى ملء جميع الحقول!", true);
+            if(oldPwd !== userDbSecPwd) return showToast("كلمة المرور القديمة غير صحيحة!", true);
+            if(newPwd !== confirmPwd) return showToast("كلمة المرور الجديدة غير متطابقة!", true);
+            if(newPwd.length < 6) return showToast("يجب أن تتكون من 6 أرقام/أحرف على الأقل", true);
+
+            updateDoc(doc(db, "users", auth.currentUser.uid), {
+                withdrawPassword: newPwd
+            }).then(() => {
+                closeAllModals();
+                showToast("تم تغيير كلمة مرور الأمان بنجاح!");
+            }).catch(err => showToast("حدث خطأ في الاتصال بقاعدة البيانات", true));
+        };
+
+        // نسخ الـ ID وإخفاء الرصيد والخروج
+        window.copyUID = function() {
+            if (currentUID === "------") return;
+            navigator.clipboard.writeText(currentUID).then(() => showToast("تم نسخ الـ UID بنجاح!")).catch(err => {
+                let ta = document.createElement("textarea"); ta.value = currentUID; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast("تم نسخ الـ UID بنجاح!");
+            });
+        };
+
+        window.toggleBalance = function() {
+            isBalanceHidden = !isBalanceHidden;
+            let icon = document.querySelector('.balance-title i');
+            if (isBalanceHidden) { document.getElementById('total-balance').innerText = "******"; icon.className = 'fa-solid fa-eye'; } 
+            else { document.getElementById('total-balance').innerText = actualBalance; icon.className = 'fa-solid fa-eye-slash'; }
+        };
+
+        window.performLogout = function() { 
+            signOut(auth).then(() => window.location.href = 'index.html').catch(() => showToast("خطأ في تسجيل الخروج", true)); 
+        };
+        
+        window.showToast = function(message, isError = false) {
+            let toast = document.getElementById('system-toast');
+            toast.innerText = message; toast.className = `toast ${isError ? 'error' : ''}`;
+            toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2500);
+        };
+
+
+    </script>
+</body>
+</html>
+

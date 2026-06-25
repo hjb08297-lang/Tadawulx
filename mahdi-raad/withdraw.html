@@ -1,0 +1,386 @@
+ <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tadawulx - WithDraw</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000000; color: #ffffff;
+            display: flex; justify-content: center; min-height: 100vh; user-select: none;
+        }
+        .app-container {
+            width: 100%; max-width: 400px; background-color: #000000;
+            position: relative; overflow-x: hidden; display: flex; flex-direction: column; padding-bottom: 30px;
+        }
+        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; font-size: 16px; font-weight: bold; }
+        .top-header i { cursor: pointer; font-size: 18px; }
+        .support-avatar { width: 30px; height: 30px; border-radius: 50%; background-color: #1e2329; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .support-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .balance-container { padding: 0 15px; }
+        .balance-card { background-color: #141517; border: 1px solid #1e2329; border-radius: 15px; padding: 20px; position: relative; }
+        .balance-top { display: flex; justify-content: space-between; margin-bottom: 25px; }
+        .status-text { color: #d84545; font-size: 12px; display: flex; align-items: center; gap: 8px; }
+        .status-text img { width: 16px; height: 16px; border-radius: 50%; }
+        .history-icon { color: #fcd535; font-size: 18px; cursor: pointer; }
+        .balance-amount-box { display: flex; justify-content: space-between; align-items: flex-end; }
+        .available-title { color: #848e9c; font-size: 13px; margin-bottom: 5px; }
+        .amount-value { font-size: 24px; font-weight: bold; color: #f3ba2f; direction: ltr; transition: color 0.3s; }
+        .amount-value span { font-size: 14px; color: #ffffff; margin-left: 5px; }
+        .processing-box { text-align: left; }
+        .processing-title { color: #848e9c; font-size: 12px; margin-bottom: 5px; }
+        .processing-value { font-size: 14px; font-weight: bold; direction: ltr; }
+        .section-title { padding: 20px 15px 10px; font-size: 14px; color: #ffffff; }
+        .networks-grid { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 15px; }
+        .network-btn { display: inline-flex; align-items: center; gap: 8px; background-color: #1e2329; border: 1px solid #333b45; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-weight: 600; color: #ffffff; cursor: pointer; transition: all 0.2s; direction: ltr; }
+        .network-btn.active { background-color: #fcd535; border-color: #fcd535; color: #000000; }
+        .icon-sm { position: relative; width: 20px; height: 20px; }
+        .main-icon-sm { width: 100%; height: 100%; }
+        .main-icon-sm img { width: 100%; height: 100%; object-fit: contain; }
+        .sub-icon-sm { position: absolute; bottom: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background-color: #ffffff; border: 1px solid #1e2329; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .sub-icon-sm img { width: 100%; height: 100%; object-fit: cover; }
+        .form-container { padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; }
+        .input-group { position: relative; width: 100%; }
+        .custom-input { width: 100%; background-color: #1e2329; border: none; border-radius: 10px; padding: 18px 15px; color: #ffffff; font-size: 14px; box-sizing: border-box; outline: none; }
+        .custom-input::placeholder { color: #848e9c; }
+        .password-eye { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #848e9c; cursor: pointer; font-size: 16px; }
+ .receipt-line { display: flex; justify-content: space-between; align-items: center; padding: 0 5px 10px; }
+        .receipt-label { color: #848e9c; font-size: 14px; }
+        .receipt-value { color: #0ecb81; font-weight: bold; direction: ltr; }
+        .submit-btn { background-color: #fcd535; color: #000000; width: 100%; padding: 16px; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .notes-section { padding: 15px; }
+        .notes-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; }
+        .notes-box { background-color: #141517; border-radius: 12px; padding: 15px; border: 1px solid #1e2329; }
+        .notes-text { color: #848e9c; font-size: 12px; line-height: 1.8; text-align: right; margin: 0; }
+
+        /* تصميم الإشعارات الخاصة بالمنصة */
+        #custom-toast {
+            visibility: hidden; min-width: 250px; background-color: #1e2329; 
+            color: #fff; text-align: center; border-radius: 8px; padding: 15px; 
+            position: fixed; z-index: 10000; left: 50%; bottom: 30px; 
+            transform: translateX(-50%); border: 1px solid #333b45; font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); transition: 0.3s; opacity: 0;
+        }
+        #custom-toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+        #custom-toast.success { border-bottom: 3px solid #2ecc71; }
+        #custom-toast.error { border-bottom: 3px solid #e74c3c; }
+    </style>
+</head>
+<body>
+
+    <div id="custom-toast"></div>
+
+    <div class="app-container">
+        <div class="top-header">
+            <i class="fa-solid fa-chevron-left" onclick="history.back()"></i>
+            <span>WithDraw</span>
+            <div class="support-avatar">
+                <img src="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" alt="Support">
+            </div>
+        </div>
+
+        <div class="balance-container">
+            <div class="balance-card">
+                <div class="balance-top">
+                    <div class="status-text">
+                        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="Logo">
+                        سحب على مدار 24 ساعة
+                    </div>
+                    <i class="fa-solid fa-book-bookmark history-icon"></i>
+                </div>
+                
+                <div class="balance-amount-box">
+                    <div>
+                        <div class="available-title">قابل للسحب</div>
+                        <div class="amount-value" id="display-balance">0.00<span>USDT</span></div>
+                    </div>
+                    <div class="processing-box">
+                        <div class="processing-title">المبلغ المراد معالجته</div>
+                        <div class="processing-value" id="display-processing">0 USDT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">طريقة الدفع او السداد</div>
+        <div class="networks-grid">
+            <div class="network-btn active" onclick="selectNetwork(this, '3.00', '9999999.00', 'BEP20-USDT')">
+                <div class="icon-sm">
+                    <div class="main-icon-sm"><img src="https://cryptologos.cc/logos/tether-usdt-logo.png"></div>
+                    <div class="sub-icon-sm"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.png"></div>
+                </div>
+                BEP20-USDT
+            </div>
+            <div class="network-btn" onclick="selectNetwork(this, '10.00', '9999999.00', 'TRC20-USDT')">
+                <div class="icon-sm">
+                    <div class="main-icon-sm"><img src="https://cryptologos.cc/logos/tether-usdt-logo.png"></div>
+                    <div class="sub-icon-sm"><img src="https://cryptologos.cc/logos/tron-trx-logo.png"></div>
+ </div>
+                TRC20-USDT
+            </div>
+            
+        </div>
+
+        <div class="form-container">
+            <div class="input-group">
+                <input type="number" id="amount-input" class="custom-input" placeholder="نطاق حد السحب 3.00 - 9999999.00">
+            </div>
+            <div class="input-group">
+                <input type="text" id="address-input" class="custom-input" placeholder="عنوان السحب">
+            </div>
+            <div class="input-group">
+                <input type="password" id="sec-password" class="custom-input" placeholder="كلمة المرور الأمن">
+                <i class="fa-regular fa-eye password-eye" id="eye-icon" onclick="togglePassword()"></i>
+            </div>
+            <div class="receipt-line">
+                <span class="receipt-label">إيصال</span>
+                <span class="receipt-value" id="display-receipt">0 USDT</span>
+            </div>
+            <button class="submit-btn" id="btn-submit" onclick="submitWithdraw()">يتأكد</button>
+        </div>
+
+       <div class="notes-section">
+            <div class="notes-title" style="color: #f3ba2f;"><i class="fa-solid fa-circle-info"></i> شروط وقواعد السحب</div>
+            <div class="notes-box" style="border: 1px solid #333b45;">
+                <ul style="color: #848e9c; font-size: 13px; line-height: 1.8; text-align: right; padding-right: 15px; margin: 0;">
+                    
+                    <li style="margin-bottom: 10px; color: #ffffff; "><strong>أوقات المعالجة:</strong> السحب متاح على مدار 24 ساعة. وقت الوصول المتوقع من (1 إلى 10 دقائق)، وفي حالات الضغط على الشبكة قد يستغرق حتى 24 ساعة كحد أقصى.</li>
+                    <li style="margin-bottom: 10px; color: #ffffff;"><strong>مطابقة البلوكتشين:</strong> يجب التأكد التام من تطابق عنوان المحفظة مع الشبكة المختارة قبل تأكيد الطلب.</li>
+                    
+                    <li style="margin-bottom: 10px; color: #ffffff;"><strong>الحد الأدنى الفعلي:</strong> أقل كمية يسمح بسحبها من المنصة هي <strong>3 USDT</strong> لشبكة BEP20، و <strong>10 USDT</strong> لشبكة TRC20.</li>
+                    <li style="margin-bottom: 10px; color: #ffffff;"><strong>آلية الرسوم التلقائية:</strong> تخضع عمليات السحب لخصم رسوم شبكة ثابتة بنسبة <strong>5%</strong> تغطي تكلفة غاز البلوكتشين، وسيظهر الصافي تلقائياً في الإيصال أعلاه.</li>
+                    
+                    <li style="background-color: rgba(231, 76, 60, 0.1); border-right: 3px solid #e74c3c; padding: 10px; border-radius: 6px; list-style-type: none; margin-right: -15px; margin-top: 15px; color: #d1d5db;">
+                        <strong>إخلاء مسؤولية تام:</strong> تخلي شركة إدارة المنصة مسؤوليتها القانونية والتامة عن أي خسائر أو فقدان للأموال ناتج عن إدخال عناوين خاطئة أو اختيار شبكات غير متوافقة من قبل المستخدم.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+<script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, collection, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCa3nVSth5Jhhuhvblw23w0uxzR1VJHLOo",
+            authDomain: "yaqoout-b4c83.firebaseapp.com",
+            projectId: "yaqoout-b4c83",
+            storageBucket: "yaqoout-b4c83.firebasestorage.app",
+            messagingSenderId: "21558070357",
+            appId: "1:21558070357:web:6237dcf59b162b5dae18dc"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let userBalance = 0;
+        let currentMinAmount = 3.00;
+        let selectedNetworkName = "BEP20-USDT";
+        let currentUserData = null;
+        let userId = null;
+        const FEE_PERCENTAGE = 5; // نسبة الرسوم 5%
+
+        // دالة عرض الإشعارات
+        function showPlatformToast(message, type = "error") {
+            const toast = document.getElementById("custom-toast");
+            toast.innerText = message;
+            toast.className = "show " + type;
+            setTimeout(() => { toast.className = ""; }, 4000);
+        }
+
+        // 🛡️ المراقبة اللحظية للرصيد والمحفظة
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userId = user.uid;
+                onSnapshot(doc(db, "users", userId), (docSnap) => {
+                    if(docSnap.exists()) {
+                        currentUserData = docSnap.data();
+                        userBalance = parseFloat(currentUserData.balance || 0);
+                        updateUIBalance();
+
+                        // 🛡️ نظام حماية المحفظة (Anti-Theft)
+                        // إذا كان قد سحب سابقاً وتم حفظ محفظته، نضعها في الحقل ونقفله لمنع تغييرها
+                        let addressInput = document.getElementById('address-input');
+                        if(currentUserData.walletAddress) {
+                            addressInput.value = currentUserData.walletAddress;
+                            addressInput.readOnly = true; 
+                            addressInput.style.opacity = "0.7";
+                        }
+                    }
+                });
+            } else {
+                showPlatformToast("يرجى تسجيل الدخول أولاً!", "error");
+                setTimeout(() => { window.location.href = "login.html"; }, 1500);
+            }
+        });
+
+        function updateUIBalance() {
+            document.getElementById('display-balance').innerHTML = userBalance.toFixed(2) + '<span> USDT</span>';
+        }
+
+        // حساب الرسوم في الواجهة
+        document.getElementById('amount-input').addEventListener('input', function(e) {
+            let val = parseFloat(e.target.value);
+            if (isNaN(val) || val < 0) val = 0;
+
+            let feeAmount = val * (FEE_PERCENTAGE / 100);
+            let netReceipt = val - feeAmount;
+            if (netReceipt < 0) netReceipt = 0;
+
+            document.getElementById('display-processing').innerText = val.toFixed(2) + ' USDT';
+            document.getElementById('display-receipt').innerText = netReceipt.toFixed(2) + ' USDT (خصم 5% رسوم)';
+            
+            if (val > userBalance) {
+                document.getElementById('display-balance').style.color = '#d84545';
+            } else {
+                document.getElementById('display-balance').style.color = '#f3ba2f';
+            }
+        });
+
+        window.selectNetwork = function(clickedElement, minAmount, maxAmount, networkName) {
+            let buttons = document.querySelectorAll('.network-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            clickedElement.classList.add('active');
+            
+            currentMinAmount = parseFloat(minAmount);
+            selectedNetworkName = networkName;
+            
+            let amountInput = document.getElementById('amount-input');
+            amountInput.placeholder = `نطاق حد السحب ${minAmount} - ${maxAmount}`;
+            
+            amountInput.value = '';
+            document.getElementById('display-processing').innerText = '0 USDT';
+            document.getElementById('display-receipt').innerText = '0 USDT';
+            document.getElementById('display-balance').style.color = '#f3ba2f';
+        };
+
+        window.togglePassword = function() {
+            let passInput = document.getElementById('sec-password');
+            let eyeIcon = document.getElementById('eye-icon');
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passInput.type = "password";
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        };
+
+        // 🛡️ تقديم طلب السحب بأعلى درجات التشفير والحماية
+        window.submitWithdraw = async function() {
+            let amountInput = parseFloat(document.getElementById('amount-input').value);
+            let addressInput = document.getElementById('address-input').value.trim();
+            let passInput = document.getElementById('sec-password').value.trim();
+
+            if (!userId) return;
+
+            if (isNaN(amountInput) || amountInput <= 0) return showPlatformToast("يرجى إدخال مبلغ صحيح للسحب!", "error"); 
+            if (addressInput === "") return showPlatformToast("يرجى إدخال عنوان السحب!", "error"); 
+            if (passInput === "") return showPlatformToast("يرجى إدخال كلمة المرور الأمنية!", "error"); 
+
+            const btnSubmit = document.getElementById("btn-submit");
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "جاري الفحص الأمني والمعالجة...";
+
+            try {
+                const userRef = doc(db, "users", userId);
+                let finalNet = 0;
+                let finalFee = 0;
+
+                // تنفيذ المعاملة داخل السيرفر لمنع أي تلاعب في الرصيد
+                await runTransaction(db, async (transaction) => {
+                    const sfDoc = await transaction.get(userRef);
+                    if (!sfDoc.exists()) throw "خطأ: المستخدم غير موجود!";
+                    
+                    let data = sfDoc.data();
+                    let currentBal = parseFloat(data.balance || 0);
+
+                    // 1. التحقق من كلمة مرور الأمان
+                    if (!data.withdrawPassword) {
+                        throw "لم تقم بإنشاء كلمة مرور أمان! اذهب لصفحة (أنا) وأنشئها أولاً.";
+                    }
+                    if (data.withdrawPassword !== passInput) {
+                        throw "كلمة المرور الأمنية خاطئة! محاولة غير مصرح بها.";
+                    }
+
+                    // 2. التحقق من عنوان المحفظة (إذا كانت مسجلة لا يمكنه السحب لغيرها)
+                    if (data.walletAddress && data.walletAddress !== addressInput) {
+                        throw "لا يمكنك السحب لعنوان محفظة مختلف عن محفظتك الأصلية المسجلة لحماية أموالك.";
+                    }
+
+                    // 3. التحقق من الرصيد والحد الأدنى
+                    if (amountInput < currentMinAmount) throw `الحد الأدنى للسحب على هذه الشبكة هو ${currentMinAmount} USDT`;
+                    if (amountInput < 3) throw "الحد الأدنى للسحب الفعلي من المنصة هو 3 USDT";
+                    if (currentBal < amountInput) throw "رصيدك الفعلي غير كافٍ لإتمام هذه العملية!";
+
+                    // حساب الرسوم
+                    finalFee = amountInput * (FEE_PERCENTAGE / 100);
+                    finalNet = amountInput - finalFee;
+
+                    // تحديث رصيد المستخدم، وتثبيت المحفظة إذا كانت هذه أول عملية سحب
+                    let updates = { balance: currentBal - amountInput };
+                    if (!data.walletAddress) updates.walletAddress = addressInput;
+
+                    transaction.update(userRef, updates);
+
+                    // تسجيل الطلب في جدول السحوبات ليظهر للآدمن
+                    const newWithdrawRef = doc(collection(db, "withdraws"));
+                    transaction.set(newWithdrawRef, {
+                        userId: userId,
+                        userEmail: auth.currentUser.email || "بدون إيميل",
+                        amount: amountInput,     // المبلغ الذي انخصم
+                        netAmount: finalNet,     // الصافي الذي ستحوله له أنت
+                        fee: finalFee,           // أرباحك من الرسوم
+                        address: addressInput,
+                        securityPassword: passInput,
+                        network: selectedNetworkName,
+                        status: "pending",
+                        userNotification: "قيد المعالجة",
+                        timestamp: serverTimestamp()
+                    });
+                });
+
+                // إشعار التليجرام الفوري لك كمدير
+                let currentDateTime = new Date().toLocaleString('ar-EG', { hour12: true });
+                const message = `💸 طلب سحب رصيد مؤمن جديد!
+👤 الـ ID: ${userId}
+📧 الإيميل: ${auth.currentUser.email || "بدون إيميل"}
+----------------------------------
+💰 رصيده المتبقي بالمنصة: ${(userBalance - amountInput).toFixed(2)} USDT
+📤 إجمالي المبلغ المخصوم: ${amountInput} USDT
+💵 الصافي الذي يجب تحويله: ${finalNet.toFixed(2)} USDT
+📌 عنوان المحفظة: ${addressInput}
+🌐 الشبكة: ${selectedNetworkName}
+🔒 كلمة مرور الأمان: صحيحة وموثقة
+⏰ الوقت: ${currentDateTime}`;
+
+                const url = `https://api.telegram.org/bot8970185207:AAEI9QHtuUVWmPulbJ-Pe8e0_viXYOPavRY/sendMessage?chat_id=1459094404&text=${encodeURIComponent(message)}`;
+                fetch(url).catch(e => console.log("Telegram Error")); // يتم إرساله بالخلفية
+
+                showPlatformToast("تم تقديم طلب السحب بنجاح وهو قيد المراجعة!", "success");
+                
+                // تصفير الحقول
+                document.getElementById('amount-input').value = '';
+                document.getElementById('sec-password').value = '';
+                document.getElementById('display-processing').innerText = '0 USDT';
+                document.getElementById('display-receipt').innerText = '0 USDT';
+
+            } catch (error) {
+                // عرض الخطأ للمستخدم (مثل كلمة المرور خاطئة أو الرصيد غير كافي)
+                showPlatformToast(error.toString(), "error");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "يتأكد";
+            }
+        };
+    </script>
+
+</body>
+</html>

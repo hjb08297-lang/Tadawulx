@@ -1,0 +1,350 @@
+ <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tadawulx - فريق</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #000000;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 30px;
+        }
+
+        /* الهيدر العلوي */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 1px solid #1e2329;
+        }
+        .top-header i { cursor: pointer; font-size: 18px; }
+        .header-avatar img { width: 30px; height: 30px; border-radius: 50%; }
+
+        /* كارت الإحصائيات */
+        .stats-card {
+            background-color: #141517;
+            border: 1px solid #1e2329;
+            border-radius: 15px;
+            margin: 15px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .stat-box { text-align: right; }
+        .stat-title { color: #848e9c; font-size: 11px; margin-bottom: 5px; }
+        .stat-value { font-size: 20px; font-weight: bold; color: #ffffff; }
+
+        /* أزرار التبديل (Tabs) */
+        .tabs-container {
+            background-color: #141517;
+            border: 1px solid #1e2329;
+            border-radius: 25px;
+            margin: 0 15px;
+            display: flex;
+            padding: 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 22px;
+            background: none;
+            color: #848e9c;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background-color: #fcd535;
+            color: #000000;
+        }
+
+        /* عنوان القسم والفلتر */
+        .section-sub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px 10px;
+        }
+        .section-title { font-size: 15px; font-weight: bold; }
+        .level-dropdown {
+            background-color: #141517;
+            color: #ffffff;
+            border: 1px solid #1e2329;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        /* عناوين الحقول (تطابق الهيدر بالصورة) */
+        .table-header {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1.2fr;
+            background-color: #141517;
+            padding: 12px 15px;
+            margin: 0 15px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #848e9c;
+            text-align: center;
+        }
+
+        /* حاوية قائمة الأعضاء */
+        .members-list {
+            display: none; /* تظهر فقط عند وجود بيانات */
+            padding: 0 15px;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .member-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1.2fr;
+ background-color: #141517;
+            border: 1px solid #1e2329;
+            padding: 14px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            text-align: center;
+            align-items: center;
+        }
+        .member-id { color: #ffffff; font-weight: 500; }
+        .member-amount { color: #0ecb81; font-weight: bold; direction: ltr; }
+        .member-date { color: #848e9c; font-size: 11px; }
+
+        /* واجهة فارغ (بنفس شكل وتصميم الصورة مالتك) */
+        .empty-state {
+            display: flex; /* تظهر افتراضياً حتى يكتمل التحميل */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 0;
+            color: #848e9c;
+            font-size: 14px;
+        }
+        .empty-box {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .empty-box img { width: 70px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="top-header">
+            <i class="fa-solid fa-chevron-right" onclick="history.back()"></i>
+            <span>فريق</span>
+            <div class="header-avatar">
+                <img src="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" alt="User">
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <div class="stat-box">
+                <div class="stat-title">(USDT) أرباح اليوم</div>
+                <div class="stat-value" id="today-rewards">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">(USDT) إجمالي الإيرادات</div>
+                <div class="stat-value" id="total-revenue">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">تسجيل جديد اليوم</div>
+                <div class="stat-value" id="today-signups">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">مجموع الناس</div>
+                <div class="stat-value" id="total-people">0</div>
+            </div>
+        </div>
+
+        <div class="tabs-container">
+            <button class="tab-btn" id="tab-contribution" onclick="switchTab('contribution')">مساهمة الفريق</button>
+            <button class="tab-btn active" id="tab-members" onclick="switchTab('members')">أعضاء الفريق</button>
+        </div>
+
+        <div class="section-sub-header">
+            <span class="section-title" id="section-dynamic-title">تسجيل جديد اليوم 0</span>
+            <select class="level-dropdown" id="level-select" onchange="loadTeamData()">
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+                <option value="3">Level 3</option>
+            </select>
+        </div>
+
+        <div class="table-header" id="table-header-titles">
+            <span>وقت التسجيل</span>
+            <span>درجة</span>
+            <span>حساب</span>
+        </div>
+
+        <div class="members-list" id="list-container"></div>
+
+        <div class="empty-state" id="empty-view">
+            <div class="empty-box">
+                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty Box">
+            </div>
+            <span>فارغ</span>
+        </div>
+
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // إعدادات الفايربيز الخاصة بمنصتك
+        const firebaseConfig = {
+            apiKey: "AIzaSyCa3nVSth5Jhhuhvblw23w0uxzR1VJHLOo",
+            authDomain: "yaqoout-b4c83.firebaseapp.com",
+            projectId: "yaqoout-b4c83",
+            storageBucket: "yaqoout-b4c83.firebasestorage.app",
+            messagingSenderId: "21558070357",
+            appId: "1:21558070357:web:6237dcf59b162b5dae18dc"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // دالة التبديل بين التبويبات (مربوطة بالتصميم مالتك)
+        window.switchTab = function(type) {
+            let contribBtn = document.getElementById('tab-contribution');
+            let membersBtn = document.getElementById('tab-members');
+            let tableHeader = document.getElementById('table-header-titles');
+            
+            if (type === 'contribution') {
+                contribBtn.classList.add('active');
+                membersBtn.classList.remove('active');
+                tableHeader.innerHTML = `<span>حساب</span><span>النوع المالي</span><span>سجل الوقت</span><span>دخل</span>`;
+                tableHeader.style.gridTemplateColumns = "1fr 1fr 1fr 1fr";
+            } else {
+                membersBtn.classList.add('active');
+                contribBtn.classList.remove('active');
+                tableHeader.innerHTML = `<span>وقت التسجيل</span><span>درجة</span><span>حساب</span>`;
+                tableHeader.style.gridTemplateColumns = "1.2fr 1fr 1.2fr";
+            }
+        };
+
+        // تشغيل مراقب البيانات الحقيقي بمجرد دخول المستخدم
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // 1. الاستماع اللحظي لبيانات المستخدم الحالي (لجلب أرباحه من الفريق)
+                onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const myData = docSnap.data();
+                        const totalRewards = parseFloat(myData.totalTeamRewards || 0).toFixed(2);
+                        document.getElementById('total-revenue').innerText = totalRewards;
+                        // يمكن تخصيص أرباح اليوم لاحقاً بحسبة رياضية، حالياً نعرض الإجمالي
+                        document.getElementById('today-rewards').innerText = totalRewards; 
+                    }
+                });
+
+                // 2. الاستماع اللحظي لفريق المستخدم (الذين سجلوا برمز دعوته)
+                const teamQuery = query(collection(db, "users"), where("referredByUid", "==", user.uid));
+                
+                onSnapshot(teamQuery, (snapshot) => {
+                    const listContainer = document.getElementById('list-container');
+                    const emptyView = document.getElementById('empty-view');
+                    
+                    let todaySignupsCount = 0;
+                    const today = new Date().toLocaleDateString('ar-EG');
+
+                    // تحديث العدد الإجمالي للفريق
+                    document.getElementById('total-people').innerText = snapshot.size;
+
+                    if (snapshot.empty) {
+                        // إظهار واجهة فارغ إذا لم يكن هناك مدعوين
+                        listContainer.style.display = 'none';
+                        emptyView.style.display = 'flex';
+                        document.getElementById('today-signups').innerText = "0";
+                        document.getElementById('section-dynamic-title').innerText = "تسجيل جديد اليوم 0";
+                        return;
+                    }
+
+                    // إخفاء واجهة فارغ وإظهار القائمة
+                    emptyView.style.display = 'none';
+                    listContainer.style.display = 'flex';
+                    listContainer.innerHTML = ""; 
+
+                    // فرز وعرض الأعضاء
+                    snapshot.forEach((memberDoc) => {
+                        const member = memberDoc.data();
+                        
+                        // معالجة التاريخ والوقت
+                        let regDateStr = 'غير متوفر';
+                        if (member.createdAt) {
+                            const dateObj = new Date(member.createdAt.seconds * 1000);
+                            regDateStr = dateObj.toLocaleDateString('ar-EG');
+                            if (regDateStr === today) {
+                                todaySignupsCount++; // حساب تسجيلات اليوم
+                            }
+                        }
+
+                        // تحديد الدرجة (VIP أو عادي)
+                        const isVip = member.activeVipId && member.activeVipId > 0;
+                        const degreeHtml = isVip 
+                            ? `<span style="color:#0ecb81; font-weight:bold; background:#0ecb8122; padding:2px 8px; border-radius:4px;">VIP نشط</span>` 
+                            : `<span style="color:#848e9c;">مستخدم عادي</span>`;
+
+                        // إخفاء جزء من رقم الهاتف للحماية (مثال: 0770***123)
+                        const phoneStr = member.phone || "غير معروف";
+                        const maskedPhone = phoneStr.length >= 10 ? phoneStr.substring(0, 4) + "***" + phoneStr.substring(phoneStr.length - 3) : phoneStr;
+
+                        // بناء صف العضو وإضافته للتصميم
+                        let row = document.createElement('div');
+                        row.className = 'member-row';
+                        row.innerHTML = `
+                            <span class="member-date">${regDateStr}</span>
+                            <span class="member-amount">${degreeHtml}</span>
+                            <span class="member-id" style="direction: ltr;">${maskedPhone}</span>
+                        `;
+                        listContainer.appendChild(row);
+                    });
+
+                    // تحديث الإحصائيات الفوقية لعدد تسجيلات اليوم
+                    document.getElementById('today-signups').innerText = todaySignupsCount;
+                    document.getElementById('section-dynamic-title').innerText = `تسجيل جديد اليوم ${todaySignupsCount}`;
+                });
+
+            } else {
+                // إذا لم يكن مسجلاً للدخول، يتم طرده لصفحة تسجيل الدخول
+                window.location.href = "login.html";
+            }
+        });
+    </script>
+
+
+</body>
+</html>
